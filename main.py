@@ -66,7 +66,6 @@ def get_reward(state):
     return -5
 
 def move_ghosts():
-    
     global ghosts 
     new_ghosts = []
     for ghost in ghosts:
@@ -100,15 +99,21 @@ def test():
         move_ghosts()
     print("Оптимальный путь:", path)
 
+def log_steps(steps, mode):
+    with open("game_results.txt", "a") as file:
+        file.write(f"Попытка №{steps[0]}: {steps[1]} шагов до награды\n")
+
 def play():
     state = (0, 0)
     invincibility_counter = 0
+    steps = 0
     print("Вы управляете персонажем! Введите UP, DOWN, LEFT, RIGHT для движения.")
     while state != goal:
         print_grid(state)
         action = input("Введите направление: ").strip().upper()
         if action in ['UP', 'DOWN', 'LEFT', 'RIGHT']:
             state = get_next_state(state, action)
+            steps += 1
         else:
             print("Некорректный ввод. Попробуйте снова.")
         move_ghosts()  
@@ -123,17 +128,21 @@ def play():
     else:
         print_grid(state)
         print("Поздравляем! Вы достигли цели!")
+        steps += 1
+        log_steps([1, steps], "Игрок")
 
 def auto_play():
     state = (0, 0)
     invincibility_counter = 0 
+    steps = 0
     print("ИИ обучается и играет сам...")
     while state != goal:
         print_grid(state)
         time.sleep(0.5)
         action = get_next_action(state)
         state = get_next_state(state, action)
-        move_ghosts() 
+        steps += 1
+        move_ghosts()
 
         if state == tabletca:
             invincibility_counter = 5 
@@ -148,6 +157,7 @@ def auto_play():
     else:
         print_grid(state)
         print("ИИ дошел до цели!")
+        log_steps([2, steps], "ИИ")
 
 mode = input("Выберите режим: 1 - Игрок, 2 - ИИ: ").strip()
 train()
